@@ -89,8 +89,6 @@ def get_lamp_values_from_openai(humidity, temperature, ldr):
             globals()[f"PB_Lamp_{key}"] = value    
 
 def create_AI_Lamp_prompt(humidity, temperature, ldr):
-    #If it's warm and humid, you need bluish light, and if it's cold and dry, you need bluish light. 
-    #prompt = f"The current temperature is {temperature} degrees with {humidity}% humidity, and the brightness level is {ldr}%. Please provide me with the RGB values and brightness level for a lighting. Also, give me a lucky comment. The format of the answer should be in JSON {{R:, G:, B:, bright:, comment:}}"
     prompt= f"The current temperature is {temperature} degrees with {humidity}% humidity, and the brightness level is {ldr}%. Please provide me with the recommended RGB values and brightness level for the lighting based on the temperature. Also, include a lucky comment. The response format should be in JSON {{R:, G:, B:, bright:, comment:}}"
     return prompt
 
