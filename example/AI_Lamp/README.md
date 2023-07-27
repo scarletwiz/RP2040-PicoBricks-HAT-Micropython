@@ -11,7 +11,7 @@ By harnessing the power of Pico and ChatGPT, AI Lamp automatically adjusts its c
 
 # HW Configuration
 
-##Pico + WIZnet Ethernet Hat (or W5100S-EVB-Pico)
+## Pico + WIZnet Ethernet Hat (or W5100S-EVB-Pico)
 This is a wired Ethernet module that can be used with Pico.
 Please attach the pin header to connect PICO + WIZnet Ethernet HAT + Pico Bricks."
 
@@ -23,7 +23,7 @@ WIZnet Ethernet HAT: https://eshop.wiznet.io/shop/module/wiznet-ethernet-hat/
 W5100S-EVB-Pico: https://eshop.wiznet.io/shop/module/w5100s-evb-pico/
 
  
-##Pico Bricks
+## Pico Bricks
 The modules to be used are RGB LED, OLED, Temp&Hum sensor, LDR, and Button.
 >OLED: SSD1306_I2C/ RGB Ramp: WS2812/ Temp& Hum: DHT11/ LDR: NORP12
 Data sheets: https://docs.picobricks.com/en/latest/datasheet.html
@@ -32,9 +32,9 @@ With Pico Bricks, module integration is possible without the need for separate w
  
 
  
-#SW Configuration
+# SW Configuration
 
-##Firmware Configuration
+## Firmware Configuration
 This is the firmware required for using OpenAI. Make sure to use the following version
 >open_ai_w5100_evb_pico_fw_v1.19.1.uf2
 
@@ -43,8 +43,8 @@ If you find it difficult, you can refer to this YouTube video for assistance:
 >WIZnet Pico Board How to Program WIZnet Pico board using MicroPython
 https://www.youtube.com/watch?v=8FcFhZRNNxE
 
-##Code Writing
-###Network
+## Code Writing
+### Network
 Since DHCP is used, there is no need to input IP or other settings. Just call the *wiznet_init()* function in ***lib/WIZnet_utils.py***
 If you are using a different SPI from the default configuration, please modify the settings for mosi, miso, sck, spi CS, and Ethernet chip reset in the wiznet_init() function as follows:
 
@@ -53,7 +53,7 @@ spi = machine.SPI(0, 2_000_000, mosi=machine.Pin(19), miso=machine.Pin(16), sck=
 nic = network.WIZNET5K(spi, machine.Pin(17), machine.Pin(20))
 ```
 
-###OpenAI
+### OpenAI
 The communication with OpenAI is written in the ***lib/chatGPT.py*** module.
 Create an API Key and insert it into the following code in *chatGPT.py* file:
 > Get OpenAI API Key: https://platform.openai.com/account/api-keys
@@ -68,7 +68,7 @@ https://www.youtube.com/watch?v=QUTDCNpLAoY&t=7s
 
 The code for sending prompts is written next step!
  
-###Modules Basic Code
+### Modules Basic Code
 The control logic for the Pico Bricks module is written based on the official provided library *picobricks.py* and is included in *picobricks_utils.py*
 
 If you are using Pico Bricks, you can use it without any additional GPIO settings.
@@ -116,7 +116,7 @@ As a solution, the PB_HumTemp module in *picobricks_utils.py* is not used.
 Instead, the DHT11 module is directly called and used in the main file.
 
 ```python
-#Class Init 
+# Class Init 
 dht_sensor = dht.DHT11(Pin(11))
 # Measure Temp& Hum
 dht_sensor.measure()
@@ -143,7 +143,7 @@ PB_LDR.map_value( old_value, old_min=10000, old_max=2000, new_min=0, new_max=100
 
 **- RGB LED(Lamp)**
  
-*** lib/picobricks_utils.py/ class picobricks_neopixel***
+***lib/picobricks_utils.py/ class picobricks_neopixel***
 ```python
 from picobricks_utils import picobricks_neopixel as _PB_neopixel
 PB_neopixel= _PB_neopixel()
@@ -153,6 +153,7 @@ For brightness, it should be adjusted within the range of 0.01 to 1.
 ```python 
 PB_neopixel.set_neopixel((PB_Lamp_R, PB_Lamp_G,PB_Lamp_B), PB_Lamp_bright/100)
 ```
+---
 
 **- OLED**
  
@@ -194,7 +195,7 @@ This is the callback function for the button when it's turned on.
 ```python
 # on_callback= turn_on_AI_Lamp
 def turn_on_AI_Lamp():
-	# measure humidity and temperature
+    # measure humidity and temperature
     humidity, temperature, ldr= get_environmental_data()
     # Request Lamp value to OpenAI
     get_lamp_values_from_openai(humidity, temperature, ldr)
@@ -249,6 +250,7 @@ prompt= create_AI_Lamp_prompt(humidity, temperature, ldr)
 ---
 
 **- Lamp Turn on**
+
 After analyzing the parsed RGB and light intensity values, we set the Lamp accordingly and display the lucky message on the OLED screen.
 ```python
 def set_lamp_value():
@@ -257,7 +259,7 @@ def set_lamp_value():
     PB_oled.print_to_oled(string=PB_Lamp_comment)
 ```
 
-##Demonstrate
+## Demonstrate
 
 At a temperature of **27 degrees Celsius and 70% humidity**, OpenAI recommends using colors in the red spectrum.
  
