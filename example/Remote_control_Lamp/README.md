@@ -1,4 +1,4 @@
-#Introduce
+# Introduce
 Have you ever found your home uncomfortably dark after stepping out? Worried that you might have left the lights on when you went out? 
 This project offers a seamless solution. 
 Using a control device and a lamp, you can remotely adjust the lamp's color and brightness, effortlessly illuminating your space.
@@ -11,7 +11,7 @@ Both devices display lamp information on an OLED screen.
 I will explain the process of the project in a very easy and simple way. 
 So, let's get started!!
 
-#0. Function definition
+# 0. Function definition
 
 I will create two devices. One will serve as a control device for managing the lamp, and the other will function as the actual lamp that can be turned on.
  Both devices will be remotely controlled through MQTT. Here are the specifics.
@@ -29,43 +29,44 @@ This data will include information to adjust the **RGB color** and **brightness*
 2. The RGB lamp device will adjust its RGB values and brightness based on the received JSON data.
 3. Show the RGB color and brightness information of the lamp on the OLED display.
 
-#1. Hardware Preparation
+# 1. Hardware Preparation
 I am using a combination of PICO+WIZnet Ethernet HAT, and Pico Bricks that I have been consistently using recently.
 
-- Pico: https://www.raspberrypi.com/products/raspberry-pi-pico/
-- WIZnet Ethernet HAT: https://eshop.wiznet.io/shop/module/wiznet-ethernet-hat/
-- W5100S-EVB-Pico: https://eshop.wiznet.io/shop/module/w5100s-evb-pico/
-- W5500-EVB-Pico: https://eshop.wiznet.io/shop/module/w5500-evb-pico
+- __Pico__: https://www.raspberrypi.com/products/raspberry-pi-pico/
+- __WIZnet Ethernet HAT__: https://eshop.wiznet.io/shop/module/wiznet-ethernet-hat/
+- __W5100S-EVB-Pico__: https://eshop.wiznet.io/shop/module/w5100s-evb-pico/
+- __W5500-EVB-Pico__: https://eshop.wiznet.io/shop/module/w5500-evb-pico
 
 
 I have used two units of both PICO and WIZnet Ethernet HAT, as well as two units of Pico Bricks.
 
-Furthermore, using Pico+WIZnet Ethernet HAT instead of W5100S-EVB-Pico or W5500-EVB-Pico is also a viable option.
+Furthermore, using __Pico+WIZnet Ethernet HAT__ instead of __W5100S-EVB-Pico or W5500-EVB-Pico__ is also a viable option.
 
 
 The modules to be used are  RGB LED, Button, Potentiomater and two of OLED.
->Modules data sheet
+>__Modules data sheet__
 https://docs.picobricks.com/en/latest/datasheet.html
 
 It is also possible to detaching and use the modules of a single Pico Bricks instead of purchasing two separate Pico Bricks.
 
-#2. SW Configuration
+# 2. SW Configuration
 ## Firmware Configuration
 I have updated the FW in Git. Please select according to the Ethernet chip version.
 >https://github.com/wiznetmaker/RP2040-PicoBricks-HAT-Micropython/tree/main/pico_uf2
 
 If you need the latest version, you can check it on the micro python homepage.
->W5100S: https://micropython.org/download/W5100S_EVB_PICO/
- W5500 : https://micropython.org/download/W5500_EVB_PICO/
+>__W5100S__: https://micropython.org/download/W5100S_EVB_PICO/
+>
+>__W5500__ : https://micropython.org/download/W5500_EVB_PICO/
 
 Downloading the firmware follows the same steps as setting up other MicroPython device.. If you find it difficult, you can refer to this YouTube video for assistance:
 
->WIZnet Pico Board How to Program WIZnet Pico board using MicroPython 
+>__WIZnet Pico Board How to Program WIZnet Pico board using MicroPython__ 
 >https://www.youtube.com/watch?v=8FcFhZRNNxE
 
 ## Network
 
-###- Network
+### - Network
 To use WIZnet W5x00 series, __import network module__ for using __WIZNET5K__ module.
 
 Enter network information and SPI information to connect to W5100S.
@@ -94,7 +95,7 @@ def wiznet_init():
     nic.ifconfig((DEVICE_IP, NETMASK, GATEWAY, DNS))
 ```
 
-###- MQTT
+### - MQTT
 And set up MQTT. The MQTT functions are in ***lib/WIZnet_MQTT.py***
 
 Sets the information for using MQTT and the callback function to be used when receiving subscrpt.
@@ -169,16 +170,12 @@ The 'publish' function takes a string data as a parameter. When the button and p
 
 
 
-##Modules
+## Modules
 The control logic for the Pico Bricks module is written based on the official provided library picobricks.py and is included in __picobricks_utils.py__
 >https://github.com/wiznetmaker/RP2040-PicoBricks-HAT-Micropython/tree/main/lib/picobricks_utils.py
 
 
 If you are using Pico Bricks, you can use it without any additional GPIO settings.
-////
-
-
-
 However, if you are using other modules, please input the GPIO values in the initialization functions of each module accordingly.
 
 __Example__
@@ -187,7 +184,7 @@ from picobricks_utils import picobricks_neopixel as _PB_neopixel
 PB_neopixel= _PB_neopixel(neopixel_pin= 6)
 ```
 
-###- Control: Potentiometer
+### - Control: Potentiometer
 It checks every 0.1 seconds and operates when the current value differs from the previous one.
 >lib/picobricks_utils.py/ class picobricks_potentiometer
 
@@ -200,13 +197,13 @@ PB_BTN= _PB_POT()
 If you want to change the checking speed, please adjust the value of 'get_pot_timer'.
 
 ```python
-	global last_brightness
-	prev_pot_value = None
-    current_pot_value= 0
-    last_pot_check = time.time()
-    get_pot_timer = 0.1
+   global last_brightness
+   prev_pot_value = None
+   current_pot_value= 0
+   last_pot_check = time.time()
+   get_pot_timer = 0.1
     
-   	while True:
+   while True:
 		...
         # Check Potentiometer value
         if (time.time() - last_pot_check) > get_pot_timer:
@@ -219,7 +216,7 @@ If you want to change the checking speed, please adjust the value of 'get_pot_ti
 
             last_pot_check = time.time()
 ```
-###- Control: Button
+### - Control: Button
 Press the button once to select colors in the order of R, G, and B
 
 >lib/picobricks_utils.py/ class picobricks_button
@@ -261,7 +258,7 @@ def push_callback_setRGB():
     update_display_and_publish_message(cur_rgb, last_brightness)
 ```
 
-###-Lamp: RGB LED
+### -Lamp: RGB LED
 Adjust the color and brightness of the lamp based on the JSON data received from mqtt_sub_callback.
 >lib/picobricks_utils.py/ class picobricks_neopixel
 lib/picobricks_utils.py/ class RGBController
@@ -276,7 +273,7 @@ Change the brightness value to 1/100. (The lamp brightness value ranges from 0 t
 neo.set_neopixel(color_dict[color], brightness/100)
 ```
 
-###- Lamp/ Control: OLED
+### - Lamp/ Control: OLED
 Display the color and brightness of the lamp on the OLED.
 >lib/picobricks_utils.py/ class picobricks_oled
 
@@ -306,7 +303,7 @@ class picobricks_oled:
 	def print_to_oled(self, string, start_x=5, start_y=5):
 	def print_line_oled(self, line1='', line2='', line3='', line4='', line5=''):
 	def print_string_oled(self, string, start_x=5, start_y=5, max_len=15, line_spacing=10):
-    ```
+```
 
 
 ---
